@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script type="module" src="/main.js" defer></script>
+    <style>
+      .logo.vanilla:hover {
+        filter: drop-shadow(0 0 2em #ffe21c);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <input type="file" id="file-input" class="file-input" />
+      <div class="btn-container">
+        <button id="file-upload-btn">Upload</button>
+        <button id="measure-scale-btn">Measure Scale</button>
+        <button id="clear-btn">Clear</button>
+        <input type="number" id="scale-input" placeholder="Scale" class="scale-input" />
+      </div>
+      <p id="file-name"></p>
+      <canvas id="pdf-canvas" width="400" height="400"></canvas>
+      <p id="greet-msg"></p>
+    </div>
+  </body>
+</html>
