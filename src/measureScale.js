@@ -31,3 +31,33 @@ const handleMouseMove = (e) => {
   prevWidth = width;
   prevHeight = height;
 };
+
+export const testTrigger = () => {
+  const testButton = document.getElementById('test-btn');
+  testButton.addEventListener('click', () => {
+    const dialog = document.getElementById('scale-input-dialog');
+    // if dialog has class inactive, remove it
+    if (dialog.classList.contains('inactive')) {
+      dialog.classList.remove('inactive');
+      dialog.classList.add('active');
+    } else {
+      dialog.classList.remove('active');
+      dialog.classList.add('inactive');
+    }
+  });
+};
+
+export const submitScale = (measureValue, canvaMeasureValue) => {
+  const submitBtn = document.getElementById('scale-input-btn');
+  submitBtn.addEventListener('click', () => {
+    const dialog = document.getElementById('scale-input-dialog');
+    // inactivate dialog
+    dialog.classList.remove('active');
+    measureValue = document.getElementById('scale-input').value;
+    console.log('scale', canvaMeasureValue/measureValue);
+  });
+}
+
+export const test = () => {
+  console.log('test');
+};

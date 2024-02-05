@@ -103,8 +103,10 @@ button {
 }
 
 #pdf-canvas {
-  /* max-width: 1000px; */
-  margin: 0 auto;
+  margin: 0 60px;
+  position: absolute;
+  left: 0;
+  z-index: 1;
   /* max-height: 100vh; */
 }
 
@@ -126,4 +128,16 @@ button {
   button:active {
     background-color: #0f0f0f;
   }
+}
+
+.canvas-container {
+  position: relative;
+}
+
+#drawing-canvas {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  left: 0;
+  margin: 0 60px;
 }
