@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fire Calculation Guide</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    li {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      margin-bottom: 40px;
+      row-gap: 12px;
+      font-size: 20px;
+      text-align: center;
+      list-style: circle;
+      list-style-type: circle;
+    }
+    ol {
+      margin: 20px;
+      list-style-type: circle;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fire Calculation Guide</h1>
+  <ol>
+    <li>Upload pdf file by clicking on Upload button. First page of the pdf file is used.
+      <img src="./src/assets/upload-guide.png" alt="upload guide" width="1000px" height="auto" />
+    </li>
+    <li>Measure scale: When click on measure scale button, user will be able to draw a line on pdf page. After release the mouse, a modal will show for user to input the real life length of the line on pdf by meter, this will allow program to match real life distance with the pdf page distance. The value is saved when user click submit on the modal.
+      <img src="./src/assets/measure-guide.gif" alt="measure scale guide" width="1000px" height="auto" />
+    </li>
+    <li>Add fire: When user click on Add fire, a fire will be added to the pdf. User can drag the fire to desired position. For now user can only add one fire.
+      <img src="/src/assets/add-fire-guide.gif" alt="fire guide" width="1000px" height="auto" />
+    </li>
+    <li>Draw: When click on Draw, User will be able to draw the path by click onto the pdf. Each click will connect the previous point with the current point. Once finish the draw, user can click on draw again to turn off drawing path on pdf.
+      <img src="./src/assets/draw-guide.gif" alt="draw guide" width="1000px" height="auto" />
+    </li>
+    <li>Input params: When click on input params button, a modal will be shown for user to input constant for calculation
+      <img src="./src/assets/input-params-guide.gif" alt="params guide" width="1000px" height="auto" />
+    </li>
+    <li>Calculate: Once all condition are met, when click on calculate, the table on the Table tab will generate the data using formula, distance and params. When user moving the fire and press again, the data will be recalculate.
+      <img src="./src/assets/calculate-guide.gif" alt="calculate guide" width="1000px" height="auto" />
+    </li>
+    <li>Export: The Export button will export all the table data into a csv file.
+      <p>Clear: Clear all the input of the program so user can redo the measure, draw and calculate again.</p>
+      <img src="./src/assets/export-clear-guide.gif" alt="export guide" width="1000px" height="auto" />
+    </li>
+    <li>
+    </li>
+  </ol>
+</body>
+
+
+</html>

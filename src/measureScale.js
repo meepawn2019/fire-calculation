@@ -47,17 +47,19 @@ export const testTrigger = () => {
   });
 };
 
-export const submitScale = (measureValue, canvaMeasureValue) => {
+export const submitScale = (measureValue, canvaMeasureValue, isMeasureScale, setScale) => {
   const submitBtn = document.getElementById('scale-input-btn');
+  let scale;
   submitBtn.addEventListener('click', () => {
+    isMeasureScale = false;
+    const measureBtn = document.getElementById("measure-scale-btn");
+    measureBtn.classList.remove('active');
     const dialog = document.getElementById('scale-input-dialog');
     // inactivate dialog
     dialog.classList.remove('active');
+    dialog.classList.add('inactive');
     measureValue = document.getElementById('scale-input').value;
-    console.log('scale', canvaMeasureValue/measureValue);
+    setScale(canvaMeasureValue/measureValue);
   });
+  return scale;
 }
-
-export const test = () => {
-  console.log('test');
-};

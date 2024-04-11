@@ -1,4 +1,4 @@
-.scale-input-container {
+.dialog-container {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -17,7 +17,7 @@
   visibility: hidden;
 }
 
-.scale-input-container.active {
+.dialog-container.active {
   visibility: visible;
   z-index: 100;
 }

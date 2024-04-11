@@ -79,6 +79,7 @@ button .active {
 button:hover {
   border-color: #396cd8;
 }
+
 button:active .active {
   border-color: #396cd8;
   background-color: #e8e8e8;
@@ -95,11 +96,6 @@ button {
 
 .file-input {
   display: none;
-}
-
-#file-upload-btn {
-  margin-top: 10px;
-  max-width: 120px;
 }
 
 #pdf-canvas {
@@ -125,9 +121,15 @@ button {
     color: #ffffff;
     background-color: #0f0f0f98;
   }
+
   button:active {
     background-color: #0f0f0f;
   }
+}
+
+button.active {
+  border-color: #396cd8;
+  background-color: #e8e8e8;
 }
 
 .canvas-container {
@@ -140,4 +142,86 @@ button {
   z-index: 2;
   left: 0;
   margin: 0 60px;
+}
+
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border-top: none;
+  margin: 20px 60px;
+}
+
+.btn-container {
+  display: flex;
+  column-gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 12px;
+}
+
+.btn-container button {
+  flex: 1 0 21%;
+  width: 120px;
+}
+
+@media (min-width: 1080px) {
+  .btn-container button {
+    flex: 1 0 8%;
+  }
+}
+
+/* .tab {
+  overflow: hidden;
+  background-color: #f1f1f1;
+  width: fit-content;
+} */
+
+.tablinks {
+  background-color: #f1f1f1;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+  border-radius: 0;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.tablinks:hover {
+  background-color: #ddd;
+}
+
+.tablinks.active {
+  background-color: #ccc;
+}
+
+#version {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 99;
 }

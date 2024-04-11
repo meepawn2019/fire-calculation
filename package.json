@@ -14,6 +14,7 @@
     "vite": "^5.0.8"
   },
   "dependencies": {
+    "@tauri-apps/api": "^1.5.3",
     "pdfjs-dist": "^3.11.174"
   }
 }

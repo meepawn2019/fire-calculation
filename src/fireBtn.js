@@ -4,6 +4,10 @@ export const addFireBtn = (drawringCanvas, firePosition, fireImageObj) => {
   const fireBtn = document.getElementById("fire-btn");
   fireBtn.addEventListener("click", () => {
     const ctx = drawringCanvas.getContext("2d");
+    console.log(firePosition.length, "firePosition.length")
+    if (firePosition.length > 0) {
+      return;
+    }
     // Add fire image in the center of the canvas
     ctx.drawImage(
       fireImageObj,
