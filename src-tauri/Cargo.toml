@@ -1,6 +1,6 @@
 [package]
-name = "fire-calculation"
-version = "0.0.1"
+name = "hob-calculation"
+version = "0.0.2"
 description = "A Tauri App"
 authors = ["you"]
 license = ""

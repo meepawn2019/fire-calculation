@@ -7,8 +7,8 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "fire-calculation",
-    "version": "0.0.1"
+    "productName": "Hob Calculation",
+    "version": "0.0.2"
   },
   "tauri": {
     "allowlist": {
@@ -45,7 +45,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "fire-calculation",
+        "title": "Hob Calculation",
         "width": 800,
         "height": 600
       }

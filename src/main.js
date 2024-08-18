@@ -22,7 +22,6 @@ let scale;
 let firePosition = [];
 let pathPosition = [];
 let measurePath = [];
-let currentPath = 0;
 let fireImageObj;
 let isDrawPath = false;
 
@@ -412,18 +411,6 @@ const calculateBtnHandler = async () => {
     const shoulderWidthValue = document.getElementById(
       "shoulder-width-input"
     ).value;
-
-    // if (
-    //   !radiativeValue ||
-    //   !hobFireValue ||
-    //   !toleranceValue ||
-    //   !walkingSpeedValue ||
-    //   !shoulderWidthValue
-    // ) {
-    //   alert("Please input all params");
-    //   return;
-    // }
-
     calculate({
       radiativeValue,
       hobFireValue,
@@ -444,7 +431,6 @@ const calculate = async (params) => {
     toleranceValue = 85.2,
     walkingSpeedValue = 1,
     shoulderWidthValue = 0.85,
-    measureValue,
     firePosition,
     pathPosition,
   } = params;
@@ -456,7 +442,6 @@ const calculate = async (params) => {
     pathPosition.forEach((point, index) => {
       const table = document.getElementById("table");
       const pathNode = document.querySelectorAll(`[path-index="${index}"]`);
-      console.log(pathNode);
       if (pathNode.length) {
         pathNode.forEach((node) => {
           node.remove();
@@ -485,7 +470,7 @@ const calculate = async (params) => {
         Math.sqrt(
           (pathPosition[index - 1].x - point.x) ** 2 +
             (pathPosition[index - 1].y - point.y) ** 2
-        ) / walkingSpeedValue;
+        ) / walkingSpeedValue / scale;
       const tdTimeToNextPoint = document.createElement("td");
       tdTimeToNextPoint.textContent = parseFloat(timeToNextPoint).toFixed(5);
       const fed = timeToNextPoint / tRad;
