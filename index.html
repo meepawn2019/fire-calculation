@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PDF Viewer</title>
     <link rel="stylesheet" href="./src/styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="/src/script.js"></script>
     <script>
       function openTab(evt, cityName) {
         // Declare all variables
@@ -40,8 +43,9 @@
         <button id="toggle-fire" disabled>Enable Fire Mode</button>
         <button id="toggle-params">Set Parameters</button>
         <button id="calculate">Calculate</button>
+        <button id="export">Export</button>
         <div class="button-container">
-          <button id="masterButton" class="master-btn">Clear</button>
+          <button id="masterButton" class="master-btn" style="height: 100%;">Clear</button>
           <div id="actionButtons" class="action-buttons">
               <button id="clear-all" class="clear-all">Clear all</button>
               <button id="clear-path" class="clear-path">Clear path</button>
@@ -52,30 +56,36 @@
       <div class="tab">
         <button class="tablinks" onclick="openTab(event, 'tab1')">PDF</button>
         <button class="tablinks" onclick="openTab(event, 'tab2')">Table</button>
+        <button class="tablinks" onclick="openTab(event, 'tab3')">Chart</button>
       </div>
-      <div id="tab1" class="tabcontent active">
-        <div class="pdf-viewer">
-          <canvas id="pdf-canvas"></canvas>
-        </div>
+    </div>
+    <div id="tab1" class="tabcontent active">
+      <div class="pdf-viewer">
+        <canvas id="pdf-canvas"></canvas>
       </div>
-      <div id="tab2" class="tabcontent">
-        <table id="table">
-            <tr>
-              <th>Location</th>
-              <th>R (distance to hob)</th>
-              <th>q''(incident heat flux)</th>
-              <th>t | rad (time to endpoint)</th>
-              <th>time</th>
-              <th>FED</th>
-              <th>Total FED</th>
-              <th>AVG</th>
-              <th>Shortest distance</th>
-              <th>Maximum incident heat flux</th>
-              <th>Time</th>
-              <th>FED sum</th>
-              <th>FED cumulative</th>
-            </tr>
-          </table>  
+    </div>
+    <div id="tab2" class="tabcontent">
+      <table id="table">
+          <tr>
+            <th>Location</th>
+            <th>R (distance to hob)</th>
+            <th>q''(incident heat flux)</th>
+            <th>t | rad (time to endpoint)</th>
+            <th>time</th>
+            <th>FED</th>
+            <th>Total FED</th>
+            <th>AVG</th>
+            <th>Shortest distance</th>
+            <th>Maximum incident heat flux</th>
+            <th>Time</th>
+            <th>FED sum</th>
+            <th>FED cumulative</th>
+          </tr>
+        </table>  
+    </div>
+    <div id="tab3" class="tabcontent">
+      <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+        <canvas id="myChart" style="cursor: initial;"></canvas>
       </div>
     </div>
 
@@ -130,7 +140,5 @@
       <button id="params-submit">Submit</button>
     </dialog>
     <div id="version"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-    <script type="module" src="/src/script.js"></script>
   </body>
 </html>
