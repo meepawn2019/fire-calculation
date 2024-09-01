@@ -1,6 +1,5 @@
 import { WebviewWindow } from "@tauri-apps/api/window";
-import { getVersion } from '@tauri-apps/api/app';
-
+import { getVersion } from "@tauri-apps/api/app";
 
 const { invoke } = window.__TAURI__.tauri;
 
@@ -10,7 +9,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   const versionEl = document.querySelector("#version");
   versionEl.textContent = appVersion;
 });
-
 
 const pdfInput = document.getElementById("pdf-input");
 const pdfCanvas = document.getElementById("pdf-canvas");
@@ -60,7 +58,8 @@ let measureMode = false;
 let fireMode = false;
 let scaleLine = null;
 let myChart;
-
+let fireScale = 0.5;
+let isMovingFire = false;
 
 pdfInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
@@ -148,7 +147,7 @@ function redrawLines() {
     ctx.arc(
       fire.x * scale,
       fire.y * scale,
-      0.5 * pixelsPerMeter * scale,
+      fireScale * pixelsPerMeter * scale,
       0,
       2 * Math.PI
     );
@@ -190,7 +189,6 @@ toggleDrawButton.addEventListener("click", () => {
   toggleDrawButton.textContent = drawMode
     ? "Disable Draw Mode"
     : "Enable Draw Mode";
-  pdfCanvas.style.cursor = drawMode ? "initial" : "grab";
 });
 
 paramsInputButton.addEventListener("click", () => {
@@ -209,12 +207,26 @@ toggleFireButton.addEventListener("click", () => {
   measureMode = false; // Disable measure mode if fire mode is active
   toggleFireButton.textContent = fireMode
     ? "Disable Fire Mode"
-    : "Enable Fire Mode";
+    : "Add Fire Mode";
   toggleDrawButton.textContent = "Enable Draw Mode";
   measureScaleButton.textContent = "Measure Scale";
 });
 
 pdfCanvas.addEventListener("mousedown", (e) => {
+  if (!e.ctrlKey && !drawMode && !measureMode) {
+    const rect = pdfCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / scale;
+    const fireIndex = fires.findIndex((fire) => {
+      const distance = Math.sqrt((fire.x - x) ** 2 + (fire.y - y) ** 2);
+      return distance <= 0.5 * pixelsPerMeter;
+    });
+    if (fireIndex !== -1) {
+      isMovingFire = true;
+      return;
+    }
+  }
+  pdfCanvas.style.cursor = "initial";
   if (drawMode) return; // Don't allow dragging in draw mode
 
   if (measureMode) {
@@ -230,13 +242,25 @@ pdfCanvas.addEventListener("mousedown", (e) => {
     return;
   }
 
-  isDragging = true;
-  dragStartX = e.clientX - pdfX;
-  dragStartY = e.clientY - pdfY;
-  pdfCanvas.style.cursor = "grabbing";
+  // If ctrl key is pressed, start dragging
+  if (e.ctrlKey) {
+    isDragging = true;
+    dragStartX = e.clientX - pdfX;
+    dragStartY = e.clientY - pdfY;
+    pdfCanvas.style.cursor = "grabbing";
+  }
 });
 
 pdfCanvas.addEventListener("mousemove", (e) => {
+  if (isMovingFire) {
+    const rect = pdfCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / scale;
+    fires[0].x = x;
+    fires[0].y = y;
+    redrawLines();
+    return;
+  }
   if (measureMode && scaleLine) {
     pdfCanvas.style.cursor = "crosshair";
     const rect = pdfCanvas.getBoundingClientRect();
@@ -251,7 +275,9 @@ pdfCanvas.addEventListener("mousemove", (e) => {
     redrawLines();
     return;
   }
+
   if (!isDragging) {
+    pdfCanvas.style.cursor = e.ctrlKey ? "grab" : "initial";
     return;
   }
   pdfX = e.clientX - dragStartX;
@@ -259,7 +285,11 @@ pdfCanvas.addEventListener("mousemove", (e) => {
   pdfCanvas.style.transform = `translate(${pdfX}px, ${pdfY}px)`;
 });
 
-pdfCanvas.addEventListener("mouseup", () => {
+pdfCanvas.addEventListener("mouseup", (e) => {
+  if (isMovingFire) {
+    isMovingFire = false;
+    return;
+  }
   if (measureMode && scaleLine) {
     scaleDialog.showModal();
     return;
@@ -269,18 +299,48 @@ pdfCanvas.addEventListener("mouseup", () => {
     return;
   }
 
-  isDragging = false;
-  pdfCanvas.style.cursor = "grab";
-  checkBounds();
-});
-
-pdfCanvas.addEventListener("mouseleave", () => {
-  if (!isDragging) {
+  if (!e.ctrlKey) {
     return;
   }
   isDragging = false;
   pdfCanvas.style.cursor = "grab";
   checkBounds();
+});
+
+pdfCanvas.addEventListener("mouseleave", (e) => {
+  if (isMovingFire) {
+    isMovingFire = false;
+  }
+  if (!isDragging) {
+    return;
+  }
+  if (e.ctrlKey) {
+    isDragging = false;
+    pdfCanvas.style.cursor = "grab";
+    checkBounds();
+  }
+});
+
+pdfCanvas.addEventListener("wheel", (e) => {
+  // if mouse position is inside fire circle, update size of fire circle
+  const rect = pdfCanvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / scale;
+  const y = (e.clientY - rect.top) / scale;
+  const fireIndex = fires.findIndex((fire) => {
+    const distance = Math.sqrt((fire.x - x) ** 2 + (fire.y - y) ** 2);
+    return distance <= 0.5 * pixelsPerMeter;
+  });
+  if (fireIndex === -1) {
+    return;
+  }
+  e.preventDefault();
+  if (e.deltaY < 0) {
+    fireScale += 0.1;
+  } else {
+    fireScale -= 0.1;
+  }
+  redrawLines();
+  return;
 });
 
 pdfCanvas.addEventListener("click", (e) => {
@@ -309,7 +369,7 @@ pdfCanvas.addEventListener("click", (e) => {
     redrawLines();
     // disable fire mode after adding a fire
     fireMode = false;
-    toggleFireButton.textContent = "Enable Fire Mode";
+    toggleFireButton.textContent = "Add Fire Mode";
     toggleFireButton.disabled = true;
   }
 });
@@ -351,7 +411,7 @@ measureScaleButton.addEventListener("click", () => {
     ? "Disable Measure Scale"
     : "Measure Scale";
   toggleDrawButton.textContent = "Enable Draw Mode";
-  pdfCanvas.style.cursor = measureMode ? "crosshair" : "grab";
+  pdfCanvas.style.cursor = measureMode ? "crosshair" : "initial";
   scaleLine = null;
   redrawLines();
 });
@@ -364,11 +424,16 @@ scaleSubmitButton.addEventListener("click", () => {
         (scaleLine.endY - scaleLine.startY) ** 2
     );
     pixelsPerMeter = pixelDistance / realWorldLength;
+  } else {
+    alert("Please enter a valid scale length");
+    return;
   }
   scaleDialog.close();
   offMeasurementMode();
-  redrawLines();
-  calculate();
+  if (fires.length > 0 && lines.length > 0) {
+    redrawLines();
+    calculate();
+  }
 });
 
 guideButton.addEventListener("click", async () => {
@@ -416,6 +481,7 @@ const calculate = () => {
   let totalFed = 0;
   let fedSum = 0;
   let timeSum = 0;
+  let timeArray = [0];
 
   lines.forEach((line, index) => {
     const distances = calculateLineLength(
@@ -437,6 +503,7 @@ const calculate = () => {
     const maximumQ =
       (radiative * hobFire) / (4 * Math.PI * shortestDistance ** 2);
     timeSum += timeToNextLine;
+    timeArray.push(timeSum.toFixed(2));
     // append to the table
     const table = document.getElementById("table");
     const row = table.insertRow(-1);
@@ -475,33 +542,35 @@ const calculate = () => {
   if (myChart) {
     myChart.destroy();
   }
+  let graphData = lines.map((line) => {
+    const distances = calculateLineLength(
+      fires[0].x,
+      fires[0].y,
+      line.endX,
+      line.endY
+    );
+    const q = (radiative * hobFire) / (4 * Math.PI * distances ** 2);
+    const tRad = toleranceLimit / q ** 1.33;
+    const timeToNextLine =
+      calculateLineLength(
+        line.startX,
+        line.startY,
+        line.endX,
+        line.endY
+      ) / walkingSpeed;
+    const fed = timeToNextLine / tRad;
+    return fed.toFixed(2);
+  });
+  graphData.unshift(0);
   // Draw line graph with y-axis as FED and x-axis as time
   myChart = new Chart("myChart", {
     type: "line",
     data: {
-      labels: Array.from(Array(lines.length).keys()),
+      labels: timeArray,
       datasets: [
         {
           label: "FED",
-          data: lines.map((line) => {
-            const distances = calculateLineLength(
-              fires[0].x,
-              fires[0].y,
-              line.endX,
-              line.endY
-            );
-            const q = (radiative * hobFire) / (4 * Math.PI * distances ** 2);
-            const tRad = toleranceLimit / q ** 1.33;
-            const timeToNextLine =
-              calculateLineLength(
-                line.startX,
-                line.startY,
-                line.endX,
-                line.endY
-              ) / walkingSpeed;
-            const fed = timeToNextLine / tRad;
-            return fed.toFixed(2);
-          }),
+          data: graphData,
           fill: false,
           borderColor: "rgb(75, 192, 192)",
           tension: 0.1,
@@ -516,15 +585,14 @@ const calculate = () => {
         x: {
           beginAtZero: true,
           title: {
-            text: 'Time',
+            text: "Time",
             display: true,
-          }
+          },
         },
       },
     },
-  })
-
-}
+  });
+};
 
 calculateButton.addEventListener("click", calculate);
 
@@ -535,8 +603,10 @@ function offMeasurementMode() {
 
 document.getElementById("masterButton").addEventListener("click", function () {
   const actionButtons = document.getElementById("actionButtons");
-  actionButtons.style.display = actionButtons.style.display === "none" ||
-  actionButtons.style.display === "" ? "block" : "none";
+  actionButtons.style.display =
+    actionButtons.style.display === "none" || actionButtons.style.display === ""
+      ? "block"
+      : "none";
 });
 
 clearAllButton.addEventListener("click", () => {
@@ -577,6 +647,7 @@ clearPathButton.addEventListener("click", () => {
 clearFireButton.addEventListener("click", () => {
   fires = [];
   toggleFireButton.disabled = false;
+  fireScale = 0.5;
   // Remove the table
   const table = document.getElementById("table");
   // Remove all rows except the first one
