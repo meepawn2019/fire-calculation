@@ -35,6 +35,7 @@ const guideButton = document.getElementById("guide-btn");
 const clearAllButton = document.getElementById("clear-all");
 const clearPathButton = document.getElementById("clear-path");
 const clearFireButton = document.getElementById("clear-fire");
+const exportButton = document.getElementById("export");
 
 const ctx = pdfCanvas.getContext("2d");
 const offscreenCanvas = document.createElement("canvas");
@@ -54,10 +55,12 @@ let drawMode = false;
 let lastPoint = null;
 let lines = []; // Store lines drawn by the user
 let fires = []; // Store fire positions
-let pixelsPerMeter = 18.895;
+let pixelsPerMeter = 14.19;
 let measureMode = false;
 let fireMode = false;
 let scaleLine = null;
+let myChart;
+
 
 pdfInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
@@ -82,7 +85,8 @@ pdfInput.addEventListener("change", (e) => {
 function renderPage(num) {
   pdfDoc.getPage(num).then((page) => {
     viewport = page.getViewport({ scale: scale });
-
+    pixelsPerMeter = viewport.height / (0.83 * 200);
+    console.log(viewport.height);
     // Update both offscreen and main canvas sizes
     offscreenCanvas.width = viewport.width;
     offscreenCanvas.height = viewport.height;
@@ -467,6 +471,59 @@ const calculate = () => {
   tdTimeSum.textContent = timeSum.toFixed(2);
   table.rows[1].appendChild(tdFedSum);
   table.rows[1].appendChild(tdTimeSum);
+  // Remove the chart if it exists
+  if (myChart) {
+    myChart.destroy();
+  }
+  // Draw line graph with y-axis as FED and x-axis as time
+  myChart = new Chart("myChart", {
+    type: "line",
+    data: {
+      labels: Array.from(Array(lines.length).keys()),
+      datasets: [
+        {
+          label: "FED",
+          data: lines.map((line) => {
+            const distances = calculateLineLength(
+              fires[0].x,
+              fires[0].y,
+              line.endX,
+              line.endY
+            );
+            const q = (radiative * hobFire) / (4 * Math.PI * distances ** 2);
+            const tRad = toleranceLimit / q ** 1.33;
+            const timeToNextLine =
+              calculateLineLength(
+                line.startX,
+                line.startY,
+                line.endX,
+                line.endY
+              ) / walkingSpeed;
+            const fed = timeToNextLine / tRad;
+            return fed.toFixed(2);
+          }),
+          fill: false,
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+        x: {
+          beginAtZero: true,
+          title: {
+            text: 'Time',
+            display: true,
+          }
+        },
+      },
+    },
+  })
+
 }
 
 calculateButton.addEventListener("click", calculate);
@@ -527,4 +584,21 @@ clearFireButton.addEventListener("click", () => {
     table.deleteRow(i);
   }
   redrawLines();
+});
+
+exportButton.addEventListener("click", () => {
+  const table = document.querySelector("table");
+  let csv = "";
+  const rows = table.querySelectorAll("tr");
+  rows.forEach((row) => {
+    const cells = row.querySelectorAll("td, th");
+    const rowData = Array.from(cells).map((cell) => cell.innerText);
+    const csvRow = rowData.join(",");
+    csv += `${csvRow}\n`;
+  });
+  const csvData = `data:text/csv;charset=utf-8,${encodeURIComponent(csv)}`;
+  const link = document.createElement("a");
+  link.setAttribute("href", csvData);
+  link.setAttribute("download", "table.csv");
+  link.click();
 });
