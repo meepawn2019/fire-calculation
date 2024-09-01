@@ -2,20 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/styles.css" />
-    <link rel="stylesheet" href="/src/scale-container.css" />
-    <link rel="stylesheet" href="/src/table-style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script type="module" src="/src/main.js" defer></script>
-    <style>
-      .logo.vanilla:hover {
-        filter: drop-shadow(0 0 2em #ffe21c);
-      }
-    </style>
+    <title>PDF Viewer</title>
+    <link rel="stylesheet" href="./src/styles.css" />
     <script>
-      function openCity(evt, cityName) {
+      function openTab(evt, cityName) {
         // Declare all variables
         var i, tabcontent, tablinks;
 
@@ -37,68 +28,109 @@
       }
     </script>
   </head>
-
   <body>
     <div class="container">
-      <input type="file" id="file-input" class="file-input" />
-      <div class="btn-container">
+      <input type="file" id="pdf-input" accept="application/pdf" />
+      <div class="toolbar">
         <button id="guide-btn">How to use</button>
-        <button id="file-upload-btn">Upload</button>
-        <button id="measure-scale-btn">Measure Scale</button>
-        <button id="fire-btn">Add fire</button>
-        <button id="draw-btn">Draw</button>
-        <button id="input-params-btn">Input params</button>
-        <button id="calculate-btn">Calculate</button>
-        <button id="export-btn">Export</button>
-        <button id="clear-btn">Clear</button>
+        <button id="zoom-in" disabled>Zoom In</button>
+        <button id="zoom-out" disabled>Zoom Out</button>
+        <button id="toggle-draw" disabled>Enable Draw Mode</button>
+        <button id="measure-scale" disabled>Measure Scale</button>
+        <button id="toggle-fire" disabled>Enable Fire Mode</button>
+        <button id="toggle-params">Set Parameters</button>
+        <button id="calculate">Calculate</button>
+        <div class="button-container">
+          <button id="masterButton" class="master-btn">Clear</button>
+          <div id="actionButtons" class="action-buttons">
+              <button id="clear-all" class="clear-all">Clear all</button>
+              <button id="clear-path" class="clear-path">Clear path</button>
+              <button id="clear-fire" class="clear-fire">Clear fire</button>
+          </div>
       </div>
-      <p id="file-name"></p>
+      </div>
       <div class="tab">
-        <button class="tablinks" id="pdf-tablinks" onclick="openCity(event, 'canvas-container')">Pdf</button>
-        <button class="tablinks" onclick="openCity(event, 'table-container')">Table</button>
+        <button class="tablinks" onclick="openTab(event, 'tab1')">PDF</button>
+        <button class="tablinks" onclick="openTab(event, 'tab2')">Table</button>
       </div>
-      <div class="canvas-container tabcontent" id="canvas-container">
-        <canvas id="pdf-canvas" width="400" height="400"></canvas>
-        <canvas id="drawing-canvas" width="400" height="400"></canvas>  
+      <div id="tab1" class="tabcontent active">
+        <div class="pdf-viewer">
+          <canvas id="pdf-canvas"></canvas>
+        </div>
       </div>
-      <div class="table-container tabcontent" id="table-container">
+      <div id="tab2" class="tabcontent">
         <table id="table">
-          <tr>
-            <th>Location</th>
-            <th>R (distance to hob)</th>
-            <th>q''(incident heat flux)</th>
-            <th>t | rad (time to endpoint)</th>
-            <th>time</th>
-            <th>FED</th>
-            <th>Total FED</th>
-            <th>AVG</th>
-            <th>Shortest distance</th>
-            <th>Maximum incident heat flux</th>
-            <th>Time</th>
-            <th>FED sum</th>
-            <th>FED cumulative</th>
-          </tr>
-        </table>
+            <tr>
+              <th>Location</th>
+              <th>R (distance to hob)</th>
+              <th>q''(incident heat flux)</th>
+              <th>t | rad (time to endpoint)</th>
+              <th>time</th>
+              <th>FED</th>
+              <th>Total FED</th>
+              <th>AVG</th>
+              <th>Shortest distance</th>
+              <th>Maximum incident heat flux</th>
+              <th>Time</th>
+              <th>FED sum</th>
+              <th>FED cumulative</th>
+            </tr>
+          </table>  
       </div>
     </div>
-    <div class="scale-input-container dialog-container inactive" id="scale-input-dialog">
-      <label for="scale-input">Please input scale in meter for the drawn line</label>
-      <input type="number" id="scale-input" placeholder="Scale" class="scale-input" />
-      <button id="scale-input-btn">Submit</button>
-    </div>
-    <div class="params-input-container dialog-container inactive" id="params-input-dialog">
+
+    <dialog id="scale-dialog" class="dialog-container">
+      <label for="scale-input">Enter real-world length (in meters):</label>
+      <input type="number" id="scale-input" min="0" step="0.01" />
+      <button id="scale-submit">Submit</button>
+    </dialog>
+    <dialog id="params-dialog" class="dialog-container">
       <label for="params-input">Radiative Fraction</label>
-      <input type="number" id="radiative-input" placeholder="Radiative Fraction" class="params-input" value="0.44" />
+      <input
+        type="number"
+        id="radiative-input"
+        placeholder="Radiative Fraction"
+        class="params-input"
+        value="0.44"
+      />
       <label for="params-input">Hob Fire Total Heat Release Rate (kW)</label>
-      <input type="number" id="hob-fire-input" placeholder="Params" class="params-input" value="472" />
-      <label for="params-input">Tolerance limit for heat exposuredose (kW/m2)</label>
-      <input type="number" id="tolerance-limit-input" placeholder="Params" class="params-input" value="85.2" />
+      <input
+        type="number"
+        id="hob-fire-input"
+        placeholder="Params"
+        class="params-input"
+        value="472"
+      />
+      <label for="params-input"
+        >Tolerance limit for heat exposuredose (kW/m2)</label
+      >
+      <input
+        type="number"
+        id="tolerance-limit-input"
+        placeholder="Params"
+        class="params-input"
+        value="85.2"
+      />
       <label for="params-input">Walking speed (m/s)</label>
-      <input type="number" id="walking-speed-input" placeholder="Params" class="params-input" value="1" />
+      <input
+        type="number"
+        id="walking-speed-input"
+        placeholder="Params"
+        class="params-input"
+        value="1"
+      />
       <label for="params-input">Shoulder width (m)</label>
-      <input type="number" id="shoulder-width-input" placeholder="Params" class="params-input" value="0.85" />
-      <button id="params-input-btn">Submit</button>
-    </div>
+      <input
+        type="number"
+        id="shoulder-width-input"
+        placeholder="Params"
+        class="params-input"
+        value="0.85"
+      />
+      <button id="params-submit">Submit</button>
+    </dialog>
     <div id="version"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script type="module" src="/src/script.js"></script>
   </body>
 </html>
