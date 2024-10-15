@@ -477,7 +477,7 @@ const calculate = () => {
     alert("Please fill in all the parameters");
     return;
   }
-
+  const feds = [0];
   let totalFed = 0;
   let fedSum = 0;
   let timeSum = 0;
@@ -497,9 +497,10 @@ const calculate = () => {
       walkingSpeed;
     const fed = timeToNextLine / tRad;
     totalFed += fed;
+    feds.push(totalFed);
     const avg = fed * timeToNextLine;
     fedSum += avg;
-    const shortestDistance = distances - 0.425;
+    const shortestDistance = distances - shoulderWidthInput.value / 2;
     const maximumQ =
       (radiative * hobFire) / (4 * Math.PI * shortestDistance ** 2);
     timeSum += timeToNextLine;
@@ -537,12 +538,12 @@ const calculate = () => {
   tdTimeSum.setAttribute("rowspan", lines.length);
   tdTimeSum.textContent = timeSum.toFixed(2);
   table.rows[1].appendChild(tdFedSum);
-  table.rows[1].appendChild(tdTimeSum);
+  table.rows[1].appendChild(tdFedSum);
   // Remove the chart if it exists
   if (myChart) {
     myChart.destroy();
   }
-  let graphData = lines.map((line) => {
+  const graphData = lines.map((line) => {
     const distances = calculateLineLength(
       fires[0].x,
       fires[0].y,
@@ -570,7 +571,7 @@ const calculate = () => {
       datasets: [
         {
           label: "FED",
-          data: graphData,
+          data: feds,
           fill: false,
           borderColor: "rgb(75, 192, 192)",
           tension: 0.1,
@@ -635,6 +636,7 @@ clearAllButton.addEventListener("click", () => {
 
 clearPathButton.addEventListener("click", () => {
   lines = [];
+  lastPoint = null;
   redrawLines();
   // Remove the table
   const table = document.getElementById("table");
